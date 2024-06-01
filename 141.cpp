@@ -13,13 +13,12 @@ public:
     if (head == nullptr) {
       return res;
     }
-    ListNode *node = head;
-    while (node->next) {
-      if (node->val == INT_MIN) {
+    while (head->next) {
+      if (head->val == INT_MIN) {
         return true;
       }
-      node->val = INT_MIN;
-      node = node->next;
+      head->val = INT_MIN;
+      head = head->next;
     }
 
     return res;
