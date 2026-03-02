@@ -1,14 +1,17 @@
 class Solution {
-private:
-  map<int, int> res;
-
 public:
-  int climbStairs(int n) {
-    res[1] = 1;
-    res[2] = 2;
-    if (res[n] == 0) {
-      res[n] = climbStairs(n - 1) + climbStairs(n - 2);
+  int recursion(int n, vector<int> &dp) {
+    if (n == 1)
+      dp[n] = 1;
+    if (n == 2)
+      dp[n] = 2;
+    if (dp[n] == 0) {
+      dp[n] = recursion(n - 1, dp) + recursion(n - 2, dp);
     }
-    return res[n];
+    return dp[n];
+  }
+  int climbStairs(int n) {
+    vector<int> dp(n + 1, 0);
+    return recursion(n, dp);
   }
 };
