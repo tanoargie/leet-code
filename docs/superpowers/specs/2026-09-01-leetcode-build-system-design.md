@@ -32,7 +32,8 @@ tests/harness_test.cpp         # self-test of harness builders (NOT a solution t
 
 ## Build system
 
-- CMake minimum 3.16, C++17.
+- CMake minimum 3.24, C++17 (3.24 so FetchContent URL downloads can set
+  `DOWNLOAD_EXTRACT_TIMESTAMP` without configure warnings).
 - GoogleTest pinned via `FetchContent` at a specific tag (v1.17.0, the latest
   stable release; verify the tag exists when implementing). Fetched once at
   configure time; requires network on first build.
