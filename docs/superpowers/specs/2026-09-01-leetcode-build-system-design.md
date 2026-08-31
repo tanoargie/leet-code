@@ -9,9 +9,9 @@ Add a local build system so LeetCode solutions in this repo can be compiled
 and tested on the machine instead of only via LeetCode's web editor.
 
 Scope: compile + run real tests. GoogleTest as the framework, CMake as the
-build tool. Initial deliverable: harness, helpers, and tests for 3 example
-problems. Test coverage grows as new problems are solved; existing problems
-get tests opportunistically.
+build tool. Initial deliverable: directory structure, harness, build system.
+**No tests are written for existing solutions** — tests are added when solving
+new problems going forward (and opportunistically for old ones).
 
 ## Layout
 
@@ -19,13 +19,14 @@ get tests opportunistically.
 CMakeLists.txt
 harness/leet.h                 # aux types + tree/list/graph builders (shared, no deps)
 problems/<n>/solution.cpp      # the LeetCode submission snippet (moved from root <n>.cpp)
-problems/<n>/test.cpp          # GoogleTest cases for the problem (only some problems)
+problems/<n>/test.cpp          # GoogleTest cases (future problems only)
+tests/harness_test.cpp         # self-test of harness builders (NOT a solution test)
 ```
 
 - Every existing solution at repo root (`<n>.cpp`, ~140 files) is migrated with
   `git mv <n>.cpp problems/<n>/solution.cpp`. File content is unchanged.
-- `test.cpp` includes `"solution.cpp"` from the same directory. One translation
-  unit per test binary, so `class Solution` never collides.
+- A `test.cpp` includes `"solution.cpp"` from the same directory. One
+  translation unit per test binary, so `class Solution` never collides.
 - Solution files must remain paste-ready LeetCode snippets: no includes, no
   main. They are never modified for the harness.
 
@@ -39,13 +40,14 @@ problems/<n>/test.cpp          # GoogleTest cases for the problem (only some pro
   - executable `lc_<n>` from `problems/<n>/test.cpp`
   - `target_include_directories` = repo root (so `#include "harness/leet.h"` works)
   - links `gtest_main`, registers with CTest
+- Initial targets: `lc_harness` (from `tests/harness_test.cpp`) only.
 - Commands:
 
 ```sh
 cmake -S . -B build
 cmake --build build -j
-./build/lc_1                      # one problem
-ctest --test-dir build -R lc_     # all registered tests
+./build/lc_<n>                    # one problem (once tests exist)
+ctest --test-dir build            # all registered tests
 ```
 
 - `.gitignore` gains `build/`.
@@ -65,7 +67,7 @@ ctest --test-dir build -R lc_     # all registered tests
     `std::vector<std::optional<int>> toVector(TreeNode*)` (level-order)
   - `ListNode* buildList(std::vector<int>)`, `std::vector<int> toVector(ListNode*)`
 
-## Example test (problems/1/test.cpp)
+## Pattern for a problem test (future problems)
 
 ```cpp
 #include "gtest/gtest.h"
@@ -74,16 +76,13 @@ ctest --test-dir build -R lc_     # all registered tests
 
 TEST(TwoSum, Example1) {
   Solution s;
-  std::vector<int> nums{2, 7, 11, 15};
+  std::vector<int> nums{2, 7, 11, 15};   // lvalue: solutions take non-const refs
   EXPECT_EQ(s.twoSum(nums, 9), (std::vector<int>{0, 1}));
 }
 ```
 
 Known quirk: solutions take non-const references (`vector<int>&`), so tests
 must pass lvalues, not temporaries.
-
-Example tests cover one vector problem (1), one linked-list problem (2), and
-one tree problem (98), including LeetCode's published sample cases.
 
 ## AGENTS.md updates
 
@@ -97,13 +96,11 @@ Replace the "do not add build files / try to compile" rule with:
 ## Commits
 
 1. `refactor: move solutions to problems/` — pure `git mv` renames.
-2. `feat: local build and test harness` — CMakeLists.txt, harness, example tests, AGENTS.md update.
+2. `feat: local build and test harness` — CMakeLists.txt, harness, harness self-test, AGENTS.md update.
 
 ## Verification
 
 - Fresh configure + build succeeds on this machine (macOS).
-- `ctest --test-dir build` all green.
+- `ctest --test-dir build` green (harness self-test only).
 - `git status` clean; migrated files show as renames with no content change
   (spot-check with `git diff --summary` / `--find-renames`).
-- Paste one migrated `solution.cpp` into LeetCode to confirm unchanged
-  behavior is out of scope; renames are content-preserving by construction.
