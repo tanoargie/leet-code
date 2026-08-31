@@ -2,19 +2,33 @@
 
 ## Repo layout
 
-Flat collection of LeetCode solutions in C++, one file per problem, named `<problem number>.cpp` at the repo root (e.g. `1.cpp`).
+LeetCode solutions in C++, one directory per problem: `problems/<n>/solution.cpp` is the submission snippet; `problems/<n>/test.cpp` (optional) holds GoogleTest cases for it. `harness/leet.h` provides `TreeNode` / `ListNode` / `Node` variants and tree/list builders used by tests.
 
-## What's in a file
+## What's in a solution file
 
-Each file is a LeetCode submission snippet: only the `class Solution` (plus helper methods/classes inside it). It is **not** standalone-compilable:
+Each `solution.cpp` is a LeetCode paste-ready snippet: only the `class Solution` (plus helper methods/classes inside it). It is **not** standalone-compilable:
 
-- No `#include`, no `main`, no local test harness.
+- No `#include`, no `main`, no test harness. Never add includes to it — tests include `solution.cpp` instead.
 - `TreeNode` / `ListNode` / `Node` struct definitions appear as a `/** */` comment block at the top of the file (copied from the LeetCode problem page) — keep this style when writing tree/linked-list solutions; use `nullptr` explicitly in constructors since LeetCode's version differs by problem.
 - Style: 2-space indent, opening brace on the same line, `class Solution { public: ... };`.
 
-## How to verify
+## How to build and test
 
-There is no build system, test runner, or CI. Solutions are verified by submitting to LeetCode. To check a single file, paste the `class Solution` into the problem's editor. Do not add build files or try to compile locally.
+```sh
+cmake -S . -B build       # first run downloads GoogleTest
+cmake --build build -j
+./build/lc_<n>            # one problem's tests
+ctest --test-dir build    # all registered tests
+```
+
+Tests are written when solving new problems, not retroactively for existing ones.
+
+## Writing tests
+
+- Test file `problems/<n>/test.cpp` includes `"solution.cpp"` from the same directory and `"harness/leet.h"` (include dir is the repo root).
+- Solutions take non-const references (`vector<int>&`): pass lvalues, not temporaries.
+- If the problem's `Node` is a graph node, put `#define Node GraphNode` before including the solution; for `next`/`random` list nodes use `RandomListNode` (see `harness/leet.h`). Tree problems use `buildTree` / `toVector`, list problems `buildList` / `toVector` for input/output construction.
+- Register new tests by calling `add_leetcode_test(<n>)` in `CMakeLists.txt`.
 
 ## Conventions
 
