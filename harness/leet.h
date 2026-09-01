@@ -37,7 +37,7 @@ struct RandomListNode {
   RandomListNode(int v) : val(v), next(nullptr), random(nullptr) {}
 };
 
-TreeNode* buildTree(const std::vector<std::optional<int>>& values) {
+inline TreeNode* buildTree(const std::vector<std::optional<int>>& values) {
   if (values.empty() || !values[0]) return nullptr;
   auto* root = new TreeNode(*values[0]);
   std::queue<TreeNode*> q;
@@ -60,7 +60,7 @@ TreeNode* buildTree(const std::vector<std::optional<int>>& values) {
   return root;
 }
 
-std::vector<std::optional<int>> toVector(TreeNode* root) {
+inline std::vector<std::optional<int>> toVector(TreeNode* root) {
   std::vector<std::optional<int>> out;
   if (!root) return out;
   std::queue<TreeNode*> q;
@@ -80,7 +80,7 @@ std::vector<std::optional<int>> toVector(TreeNode* root) {
   return out;
 }
 
-ListNode* buildList(const std::vector<int>& values) {
+inline ListNode* buildList(const std::vector<int>& values) {
   if (values.empty()) return nullptr;
   auto* head = new ListNode(values[0]);
   ListNode* cur = head;
@@ -91,7 +91,7 @@ ListNode* buildList(const std::vector<int>& values) {
   return head;
 }
 
-std::vector<int> toVector(ListNode* head) {
+inline std::vector<int> toVector(ListNode* head) {
   std::vector<int> out;
   for (; head; head = head->next) out.push_back(head->val);
   return out;
