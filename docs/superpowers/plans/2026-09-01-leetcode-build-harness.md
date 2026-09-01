@@ -1,6 +1,6 @@
 # LeetCode Local Build & Test Harness Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a CMake + GoogleTest build system so LeetCode solutions can be compiled and tested locally.
 
@@ -17,13 +17,13 @@
 **Files:**
 - Move: every root-level `<n>.cpp` → `problems/<n>/solution.cpp` (via `git mv`, content unchanged)
 
-- [ ] **Step 1: Run the migration loop**
+- [x] **Step 1: Run the migration loop**
 
 ```bash
 for f in [0-9]*.cpp; do n="${f%.cpp}"; mkdir -p "problems/$n"; git mv "$f" "problems/$n/solution.cpp"; done
 ```
 
-- [ ] **Step 2: Verify renames only, no content change**
+- [x] **Step 2: Verify renames only, no content change**
 
 ```bash
 git diff --cached --stat | tail -1
@@ -32,7 +32,7 @@ git diff --cached -M --summary | grep -c 'rename'
 
 Expected: stat shows the same number of files as `problems/*/solution.cpp` count; every entry in the summary is `rename` (no create/delete rows), count equals the number of `.cpp` files at root before the move (use `ls problems | wc -l` as the count).
 
-- [ ] **Step 3: Verify root is now clean of solution files**
+- [x] **Step 3: Verify root is now clean of solution files**
 
 ```bash
 ls [0-9]*.cpp 2>/dev/null
@@ -40,7 +40,7 @@ ls [0-9]*.cpp 2>/dev/null
 
 Expected: no output (only README.md, AGENTS.md, docs/, harness-less dirs remain at root).
 
-- [ ] **Step 4: Commit the migration**
+- [x] **Step 4: Commit the migration**
 
 ```bash
 git commit -m "refactor: move solutions to problems/"
@@ -56,7 +56,7 @@ Note: AGENTS.md still describes the old layout until Task 5; that is expected be
 - Create: `CMakeLists.txt`
 - Create: `.gitignore`
 
-- [ ] **Step 1: Check the installed CMake version**
+- [x] **Step 1: Check the installed CMake version**
 
 ```bash
 cmake --version
@@ -64,7 +64,7 @@ cmake --version
 
 Expected: 3.24 or newer (required for `DOWNLOAD_EXTRACT_TIMESTAMP` in FetchContent).
 
-- [ ] **Step 2: Verify the GoogleTest tag exists**
+- [x] **Step 2: Verify the GoogleTest tag exists**
 
 ```bash
 curl -sIL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip | head -1
@@ -72,13 +72,13 @@ curl -sIL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip | h
 
 Expected: an HTTP 2xx/3xx line (not 404).
 
-- [ ] **Step 3: Create `.gitignore`**
+- [x] **Step 3: Create `.gitignore`**
 
 ```gitignore
 build/
 ```
 
-- [ ] **Step 4: Create `CMakeLists.txt`**
+- [x] **Step 4: Create `CMakeLists.txt`**
 
 ```cmake
 cmake_minimum_required(VERSION 3.24)
@@ -106,7 +106,7 @@ function(add_leetcode_test n)
 endfunction()
 ```
 
-- [ ] **Step 5: Smoke-check configure works (no targets yet)**
+- [x] **Step 5: Smoke-check configure works (no targets yet)**
 
 ```bash
 cmake -S . -B build
@@ -114,7 +114,7 @@ cmake -S . -B build
 
 Expected: configure completes with no errors. GoogleTest is downloaded and configured. (First run needs network.)
 
-- [ ] **Step 6: Commit the build scaffolding**
+- [x] **Step 6: Commit the build scaffolding**
 
 ```bash
 git add CMakeLists.txt .gitignore
@@ -130,7 +130,7 @@ Note: the spec calls for one `feat:` commit at the end; this intermediate commit
 **Files:**
 - Create: `tests/harness_test.cpp`
 
-- [ ] **Step 1: Write the test file**
+- [x] **Step 1: Write the test file**
 
 ```cpp
 #include "gtest/gtest.h"
@@ -190,7 +190,7 @@ TEST(NodeVariants, BothExist) {
 }
 ```
 
-- [ ] **Step 2: Add the harness target to CMakeLists.txt (end of file)**
+- [x] **Step 2: Add the harness target to CMakeLists.txt (end of file)**
 
 ```cmake
 add_executable(lc_harness tests/harness_test.cpp)
@@ -199,7 +199,7 @@ target_link_libraries(lc_harness PRIVATE gtest_main)
 gtest_discover_tests(lc_harness)
 ```
 
-- [ ] **Step 3: Build and confirm it fails (missing header)**
+- [x] **Step 3: Build and confirm it fails (missing header)**
 
 ```bash
 cmake -S . -B build
@@ -215,7 +215,7 @@ Expected: FAIL — compile error: `'harness/leet.h' file not found`.
 **Files:**
 - Create: `harness/leet.h`
 
-- [ ] **Step 1: Write the header** (repo style: 2-space indent, brace on same line)
+- [x] **Step 1: Write the header** (repo style: 2-space indent, brace on same line)
 
 ```cpp
 #pragma once
@@ -318,7 +318,7 @@ std::vector<int> toVector(ListNode* head) {
 }
 ```
 
-- [ ] **Step 2: Build and run the harness tests**
+- [x] **Step 2: Build and run the harness tests**
 
 ```bash
 cmake -S . -B build
@@ -335,7 +335,7 @@ Expected: PASS — all 8 tests green (BuildTree 3, ToVectorTree 1, BuildList 2, 
 **Files:**
 - Modify: `AGENTS.md` (replace whole file)
 
-- [ ] **Step 1: Replace AGENTS.md with this content**
+- [x] **Step 1: Replace AGENTS.md with this content**
 
 ```markdown
 # AGENTS.md
@@ -376,7 +376,7 @@ Tests are written when solving new problems, not retroactively for existing ones
 - If multiple problems are solved in one session, commit each file separately with its number in the message.
 ```
 
-- [ ] **Step 2: Sanity-check the file**
+- [x] **Step 2: Sanity-check the file**
 
 ```bash
 head -5 AGENTS.md
@@ -391,7 +391,7 @@ Expected: shows the `# AGENTS.md` title and the Repo layout section.
 **Files:**
 - None new (verifies Tasks 1-5)
 
-- [ ] **Step 1: Clean configure + build + test from scratch**
+- [x] **Step 1: Clean configure + build + test from scratch**
 
 ```bash
 rm -rf build
@@ -402,7 +402,7 @@ ctest --test-dir build --output-on-failure
 
 Expected: clean configure; build succeeds; all 8 harness tests pass.
 
-- [ ] **Step 2: Verify working tree state**
+- [x] **Step 2: Verify working tree state**
 
 ```bash
 git status --short
@@ -411,7 +411,7 @@ git log --oneline -3
 
 Expected: only the changes from Tasks 2-5 are uncommitted (CMakeLists.txt, .gitignore if not committed in Task 2 Step 6, tests/harness_test.cpp, harness/leet.h, AGENTS.md). Root contains no `[0-9]*.cpp` files.
 
-- [ ] **Step 3: Commit the harness work**
+- [x] **Step 3: Commit the harness work**
 
 ```bash
 git add CMakeLists.txt .gitignore harness/leet.h tests/harness_test.cpp AGENTS.md
@@ -420,7 +420,7 @@ git commit -m "feat: local build and test harness"
 
 (If Task 2 Step 6 was committed separately, omit `.gitignore` and `CMakeLists.txt` from this commit and adjust the message accordingly.)
 
-- [ ] **Step 4: Confirm final history**
+- [x] **Step 4: Confirm final history**
 
 ```bash
 git log --oneline -4
