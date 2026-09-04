@@ -1,0 +1,7 @@
+CompileFlags:
+  CompilationDatabase: build
+
+If:
+  PathMatch: problems/.*/solution\.cpp
+CompileFlags:
+  Add: [-std=c++17, -include, /Users/tanoserio/projects/leet-code/harness/preamble.h]
